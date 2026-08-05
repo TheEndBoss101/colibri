@@ -60,6 +60,7 @@ jobs:
           for t in colibri inkling kimi_k3 olmoe deepseek-v4; do
             make $t ${{ matrix.make_args }}
           done
+          ls -lah
           ls -lh colibri${{ matrix.ext }} inkling${{ matrix.ext }} kimi_k3${{ matrix.ext }} olmoe${{ matrix.ext }} deepseek-v4${{ matrix.ext }}
 
       - uses: actions/setup-node@v4
