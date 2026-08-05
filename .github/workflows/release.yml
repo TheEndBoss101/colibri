@@ -56,7 +56,7 @@ jobs:
       - name: Build engines
         run: |
           cd c
-          for t in colibri inkling kimi_k3 olmoe; do
+          for t in colibri inkling kimi_k3 olmoe deepseek-v4; do
             make $t ${{ matrix.make_args }}
           done
           ls -lh colibri${{ matrix.ext }} inkling${{ matrix.ext }} kimi_k3${{ matrix.ext }} olmoe${{ matrix.ext }}
@@ -115,9 +115,9 @@ jobs:
           cp -r web/dist dist/web/dist
           cd dist
           if [ "${{ matrix.ext }}" = ".exe" ]; then
-            7z a colibri-${TAG}-${{ matrix.name }}.zip *
+            7z a colibri-build-${{ matrix.name }}.zip *
           else
-            tar czf colibri-${TAG}-${{ matrix.name }}.tar.gz *
+            tar czf colibri-build-${{ matrix.name }}.tar.gz *
           fi
 
       # Unpack what we are about to publish, in a clean directory, and prove `coli` finds the
@@ -128,9 +128,9 @@ jobs:
           TAG=${GITHUB_REF#refs/tags/}
           mkdir -p verify && cd verify
           if [ "${{ matrix.ext }}" = ".exe" ]; then
-            7z x ../dist/colibri-${TAG}-${{ matrix.name }}.zip > /dev/null
+            7z x ../dist/colibri-build-${{ matrix.name }}.zip > /dev/null
           else
-            tar xzf ../dist/colibri-${TAG}-${{ matrix.name }}.tar.gz
+            tar xzf ../dist/colibri-build-${{ matrix.name }}.tar.gz
           fi
           test -x colibri${{ matrix.ext }} || { echo "engine missing from archive"; ls -la; exit 1; }
           # The sibling engines, asserted the same way. #720 was exactly this failure:
@@ -208,8 +208,8 @@ jobs:
           # Extract the latest version section from CHANGELOG
           NOTES=$(awk "/^## \\[${TAG#v}\\]/{found=1;next} /^## \\[/{if(found)exit} found{print}" CHANGELOG.md)
           if [ -z "$NOTES" ]; then
-            NOTES="Release ${TAG}"
+            NOTES="Release build"
           fi
           gh release create "$TAG" artifacts/* \
-            --title "colibri ${TAG}" \
+            --title "colibri build" \
             --notes "$NOTES"
